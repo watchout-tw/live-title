@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+  <!-- IE可能不見得有效 -->
+  <META HTTP-EQUIV="EXPIRES" CONTENT="0">
+  <!-- 設定成馬上就過期 -->
+  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<title>Watchout Live Title</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- Jquery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<style>
+  body {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700;
+  }
+  .title{
+    margin: 0px; 
+    font-size:70px
+  }
+</style>
+
+<body>
+  <span id="title" class="title"></span>
+<script>
+  
+var refreshTime = 1 ;
+
+$(document).ready(function() {
+  
+  setInterval(refreshTitle, refreshTime * 1000);
+  refreshTitle();
+
+  
+
+});
+
+function refreshTitle(){
+  url = "/data"
+  $.getJSON( url, function( data ) {
+      if( !data.error || (data.error = undefined))
+      {
+        $("#title").text(data.title);
+      }
+  });
+};
+
+</script>
+
+
+</body>
+</html>

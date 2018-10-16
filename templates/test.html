@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Watchout Live Title</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- production version, optimized for size and speed -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- element ui -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+
+<style>
+  html, body{
+    padding: 0;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .head{
+    text-align: center;
+    background-color: #50e3c2;
+    color: #FFFFFF;
+    line-height: 60px;
+    font-size: 2rem;
+    font-weight: 200;
+  }
+  .tags{
+    font-size: 1.1rem;
+  }
+</style>
+
+<body>
+{% raw %}
+  <div id="app">
+    <el-header class="head"><span>Class In</span></el-header>
+    <el-main>
+      <template>
+        <el-table
+          :data="mainData.data"
+          height="80vh"
+          border
+          style="width: 100%">
+          <template v-for="(item, index) in mainData.headers">
+            <el-table-column
+              :prop="'item'+(index+1)"
+              :label="item"
+              :key="'item'+index"
+            >
+            </el-table-column>
+          </template>
+        </el-table>
+      </template>
+    </el-main>
+  </div> <!-- app -->
+{% endraw %}
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return { 
+        visible: false,
+        liveTitle: ' -- ',
+        mainTitle: '',
+        input: '',
+        def_padding: {span:16,offset:4},
+        mainData: {}
+      }
+    },
+    created: function () {
+      this.geData();
+    },
+    methods: {
+      submit(txt){
+        axios({
+          method: 'post',
+          url: '/title',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            title: txt,
+          }
+        })
+        .then((response) => {
+          this.liveTitle = response.data.title
+          this.$message({
+            showClose: true,
+            message: `設定標題為 : ${response.data.title}`,
+            type: 'success'
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
+      geData() {
+
+        //https://spreadsheets.google.com/feeds/cells/1YTB-i8QK7tx53am4uqycHVKLy1EUhfOBNYG-1GXjSRI/2/public/values?alt=json
+        axios({
+          method: 'get',
+          
+          url: 'https://spreadsheets.google.com/feeds/cells/1aKaEzOVSxhggU_ydTTvlxGID_rkBPIbS9_WZrQVREpo/1/public/values?alt=json',
+        })
+        .then((response) => {
+          this.mainData = this.handleData(23,response.data.feed.entry);
+          console.log(this.mainData.data);
+          this.$message({
+            showClose: true,
+            message: '讀取資料成功！',
+          })
+        })
+        .catch((error) => {
+          console.error(error)
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
+      handleData (rows, data) {
+        let output = {
+          headers:[],
+          data:[]
+        }
+        for (let i=0 ; i < rows ; i++) {
+          let temp = data.shift();
+          output.headers.push(temp['gs$cell']['$t'])
+        }
+        let temp = {};
+        let rowNm = data[0]['gs$cell']['row'];
+
+        for (const item of data) {
+          if ( item['gs$cell']['row'] === rowNm ) {
+            temp['item'+item['gs$cell']['col']] = item['gs$cell']['$t']
+          } else {
+            output.data.push(temp);
+            temp = {};
+            rowNm = item['gs$cell']['row'];
+            temp['item'+item['gs$cell']['col']] = item['gs$cell']['$t']
+          }
+          
+        }
+        return output
+      }
+    }
+    
+  })
+</script>
+</body>
+</html>

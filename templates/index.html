@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Watchout Live Title</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- production version, optimized for size and speed -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- element ui -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- justFont -->
+<script src="//s3-ap-northeast-1.amazonaws.com/justfont-user-script/jf-56299.js"></script>
+</head>
+
+<style>
+  html, body{
+    padding: 0;
+    margin: 0;
+    font-family: "xingothic-tc", Arial, Helvetica, sans-serif;
+  }
+  .head{
+    text-align: center;
+    background-color: #50e3c2;
+    color: #FFFFFF;
+    line-height: 60px;
+    font-size: 2rem;
+    font-weight: 200;
+  }
+  .tags{
+    font-size: 1.1rem;
+  }
+</style>
+
+<body>
+{% raw %}
+  <div id="app">
+    <el-header class="head"><span>WATCHOUT LIVE TITLE</span></el-header>
+    <el-main>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+            <el-card shadow="always">
+                <h4>目前標題：</h4>
+                <h2>{{liveTitle}}</h2>
+            </el-card>
+          </el-col>
+      </el-row>
+      <el-row :gutter="20" style="margin-top:2rem;">
+        <el-col :sm="btn_padding" style="margin-bottom:20px;">
+          <el-input v-model="title1" placeholder="輸入標題"></el-input>
+        </el-col >
+        <el-col :sm="4">
+          <el-button type="primary" style="width:100%" @click="submit(title1)">送出</el-button>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20" style="margin-top:2rem;">
+        <el-col :sm="btn_padding" style="margin-bottom:20px;">
+          <el-input v-model="title2" placeholder="輸入標題"></el-input>
+        </el-col >
+        <el-col :sm="4">
+          <el-button type="primary" style="width:100%" @click="submit(title2)">送出</el-button>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20" style="margin-top:2rem;">
+        <el-col :sm="btn_padding" style="margin-bottom:20px;">
+          <el-input v-model="title3" placeholder="輸入標題"></el-input>
+        </el-col >
+        <el-col :sm="4">
+          <el-button type="primary" style="width:100%" @click="submit(title3)">送出</el-button>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <h3>常用標題：</h3>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <template v-for="item in commons">
+              <el-button @click="submit(item.title)">{{item.title}}</el-button>
+          </template>
+        </el-col>
+      </el-row>
+    </el-main>
+  </div> <!-- app -->
+{% endraw %}
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return { 
+        visible: false,
+        liveTitle: ' -- ',
+        title1: '',
+        title2: '',
+        title3: '',
+        input: '',
+        def_padding: {span:16,offset:4},
+        btn_padding: {span:12,offset:4},
+        commons: [
+          {title:'活動即將開始'},
+          {title:'中場休息'},
+          {title:'中午休息'},
+          {title:'謝謝收看'}       
+        ]
+      }
+    },
+    mounted: function () {
+      this.getTitle();
+    },
+    methods: {
+      submit(txt){
+        axios({
+          method: 'post',
+          url: '/title',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            title: txt,
+          }
+        })
+        .then((response) => {
+          this.liveTitle = response.data.title
+          this.$message({
+            showClose: true,
+            message: `設定標題為 : ${response.data.title}`,
+            type: 'success'
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
+      getTitle() {
+        axios({
+          method: 'get',
+          url: '/data',
+        })
+        .then((response) => {
+          this.liveTitle = response.data.title
+          this.$message({
+            showClose: true,
+            message: `讀取標題成功！ : ${response.data.title}`,
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      }
+    }
+    
+  })
+</script>
+</body>
+</html>

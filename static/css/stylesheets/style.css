@@ -1,0 +1,57 @@
+/* line 3, ../sass/_common.scss */
+.hover:hover {
+  cursor: pointer;
+}
+
+/* line 5, ../sass/_common.scss */
+.addbtn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+}
+
+/* line 3, ../sass/_nav.scss */
+.c_nav {
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+/* line 7, ../sass/_nav.scss */
+.c_nav_title {
+  text-shadow: 2px 5px 10px black;
+}
+@media (min-width: 600px) {
+  /* line 7, ../sass/_nav.scss */
+  .c_nav_title {
+    margin-left: 30px;
+  }
+}
+
+/* line 2, ../sass/_footer.scss */
+footer {
+  position: fixed;
+  bottom: 0;
+  background-color: gray;
+  width: 100vw;
+}
+
+/* line 2, ../sass/_section.scss */
+section {
+  padding-top: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* line 10, ../sass/_section.scss */
+iframe {
+  border: 0;
+  width: 100%;
+  margin-top: 0.5rem;
+  height: calc(100vh - 124px - 0.5rem);
+}
+
+/* line 8, ../sass/style.scss */
+body {
+  font-family: "Microsoft JhengHei";
+  overflow-x: hidden;
+}

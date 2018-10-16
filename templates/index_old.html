@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+<title>Watchout Live Title</title>
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- Jquery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+<!--Import bootstrap.css-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- bootstrap -->
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<style>
+  body{background-color: #c6c6c6}
+</style>
+
+<body>
+
+<div style="width: 60%;margin:auto;margin-top: 10vh; border: black solid 1px;">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12"><h1>Watchout Title</h1></div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" class="form-control" id="title" placeholder="title">
+          </div>
+          <button type="botton" class="btn btn-default" id="enter">送出</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <h3>目前標題：</h3>
+        <h5 id='titie_v'></h5>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  
+$(document).ready(function() {
+
+  refreshTitle();
+  $("#enter").click(function(){
+    var title = $("#title").val();
+    var url = "/title"
+    console.log(title);
+    $.ajax({
+          type: "POST",
+          url: url,
+          data: {
+            'title': title,
+          },
+          dataType: 'JSON',
+          success: function(msg){
+             refreshTitle();
+          }
+        });
+
+  });
+
+
+});
+
+function refreshTitle(){
+  url = "/data"
+  $.getJSON( url, function( data ) {
+      if( !data.error || (data.error = undefined))
+      {
+        $("#titie_v").text(data.title);
+      }
+  });
+};
+ 
+
+</script>
+</body>
+</html>

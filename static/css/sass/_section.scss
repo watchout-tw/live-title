@@ -1,0 +1,15 @@
+
+section{
+  padding-top: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
+  @media(min-width: $size-m) {}
+}
+
+
+iframe{
+  border: 0;
+  width: 100%;
+  margin-top: 0.5rem;
+  height: calc(100vh - 124px - 0.5rem);
+}

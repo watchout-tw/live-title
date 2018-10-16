@@ -1,0 +1,11 @@
+
+
+.c_nav{
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  &_title{
+    @include text-shadow(2px 5px 10px black);
+    @media(min-width: $size-m) {margin-left: 30px;}
+  }
+}

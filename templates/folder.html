@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% include 'meta.html' %}
+<meta name="description" content={{data.description}}/>
+<meta property="og:title" content={{data.title}} />
+<meta property="og:image" content={{data.cover}} />
+</head>
+<body>
+
+<div id="app">
+<template v-if="state_init" >
+{% raw %}
+<div class="navbar-fixed">
+  <nav class="teal c_nav" style="background-image: url('https://c2.staticflickr.com/8/7229/13596308395_af35ae373d_z.jpg');">
+   <div class="nav-wrapper">
+     <ul class="left">
+       <li><span class="brand-logo c_nav_title">查理的分享清單</span></i>
+     </ul>
+     <ul class="right">
+       <li><a v-on:click="open_link('https://docs.google.com/spreadsheets/d/'+ id)"><i class="material-icons">mode_edit</i></a></li>
+     </ul>
+   </div>
+  </nav>
+</div>
+<section>
+    <div class="row">
+      <div class="col s4 m3 l2">
+        <div class="collection">
+          <template v-for="item in list_data">
+            <template v-if="item.type == 'page'">
+              <a  class="collection-item waves-effect waves-light"
+                  v-bind:class="{active:item.link == page}"
+                  v-on:click="open_page(item.link)">
+                  <span class="badge"><i class="material-icons">web</i></span>{{item.title}}
+              </a>
+            </template>
+            <template v-else-if="item.type == 'link'">
+              <a  class="collection-item waves-effect waves-light"
+                  v-bind:class="{active:item.link == page}"
+                  v-on:click="open_link(item.link)">
+                  <span class="badge"><i class="material-icons">link</i></span>{{item.title}}
+              </a>
+            </template>
+            <template v-else-if="item.type == 'folder'">
+              <a  class="collection-item waves-effect waves-light"
+                  v-bind:class="{active:item.link == page}">
+                  <span class="badge"><i class="material-icons">folder</i></span>{{item.title}}
+              </a>
+            </template>
+          </template>
+        </div>
+        <!--
+        <ul class="collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header active"><span class="new badge">4</span><i class="material-icons">filter_drama</i>First</div>
+            <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+          </li>
+          <li>
+            <div class="collapsible-header"><span class="badge">1</span><i class="material-icons">place</i>Second</div>
+            <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+          </li>
+        </ul>
+        -->
+      </div>
+      <div class="col s8 m9 l10">
+        <iframe  class="frame z-depth-1" v-bind:src="page" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+    </div>
+</section>
+{% endraw %}
+</template>
+<template v-else>
+  <div class="text-center" style="margin-top:30vh">
+    <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
+  </div>
+</template>
+</div>
+
+
+
+
+<script src="../../static/js/folder.js?ver=2016123002"></script>
+<script>
+$(document).ready(function(){
+   var path = "{{data.path}}"
+   console.log("start init:",path);
+   init_folder(path);
+});
+</script>
+</body>
+</html>
