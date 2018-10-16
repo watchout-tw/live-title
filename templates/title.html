@@ -23,39 +23,29 @@
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 700;
   }
-  .title{
-    margin: 0px; 
-    font-size:70px
-  }
 </style>
 
 <body>
-  <span id="title" class="title"></span>
-<script>
-  
-var refreshTime = 1 ;
+  <span id="title"style="margin: 0px;color:{{title_color}};font-size:{{title_size}}px"></span>
 
+<script>
+var refreshTime = 1 ;
 $(document).ready(function() {
-  
   setInterval(refreshTitle, refreshTime * 1000);
   refreshTitle();
-
-  
-
 });
-
 function refreshTitle(){
   url = "/data"
   $.getJSON( url, function( data ) {
       if( !data.error || (data.error = undefined))
       {
         $("#title").text(data.title);
+        $("#title").css("color",data.color);
+        $("#title").css("font-size",data.size+'px');
+        
       }
   });
 };
-
 </script>
-
-
 </body>
 </html>

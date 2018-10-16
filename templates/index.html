@@ -35,6 +35,9 @@
   .tags{
     font-size: 1.1rem;
   }
+  .el-color-picker__trigger{
+    width: 150px;
+  }
 </style>
 
 <body>
@@ -44,9 +47,9 @@
     <el-main>
       <el-row :gutter="20">
         <el-col :sm="def_padding">
-            <el-card shadow="always">
-                <h4>目前標題：</h4>
-                <h2>{{liveTitle}}</h2>
+            <el-card shadow="always" style="background-color: #c6c6c6;">
+                <div v-bind:style="{ color: titleColor, fontSize: titleSize + 'px' }">{{liveTitle}}</div>
+                <h4>標題大小：{{titleSize}}px | 標題顏色：{{titleColor}}</h4>
             </el-card>
           </el-col>
       </el-row>
@@ -55,7 +58,7 @@
           <el-input v-model="title1" placeholder="輸入標題"></el-input>
         </el-col >
         <el-col :sm="4">
-          <el-button type="primary" style="width:100%" @click="submit(title1)">送出</el-button>
+          <el-button type="primary" style="width:100%" @click="setTitle(title1)">送出</el-button>
         </el-col>
       </el-row>
       <el-row :gutter="20" style="margin-top:2rem;">
@@ -63,7 +66,7 @@
           <el-input v-model="title2" placeholder="輸入標題"></el-input>
         </el-col >
         <el-col :sm="4">
-          <el-button type="primary" style="width:100%" @click="submit(title2)">送出</el-button>
+          <el-button type="primary" style="width:100%" @click="setTitle(title2)">送出</el-button>
         </el-col>
       </el-row>
       <el-row :gutter="20" style="margin-top:2rem;">
@@ -71,7 +74,7 @@
           <el-input v-model="title3" placeholder="輸入標題"></el-input>
         </el-col >
         <el-col :sm="4">
-          <el-button type="primary" style="width:100%" @click="submit(title3)">送出</el-button>
+          <el-button type="primary" style="width:100%" @click="setTitle(title3)">送出</el-button>
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -82,9 +85,60 @@
       <el-row :gutter="20">
         <el-col :sm="def_padding">
           <template v-for="item in commons">
-              <el-button @click="submit(item.title)">{{item.title}}</el-button>
+              <el-button @click="setTitle(item.title)">{{item.title}}</el-button>
           </template>
         </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <h3>快選標題顏色：</h3>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <div class="block">
+          <el-col :sm="def_padding">
+            <el-button style="background-color: #000000;" @click="setColor('#000000')">黑色</el-button>
+            <el-button style="background-color: #FFFFFF;" @click="setColor('#FFFFFF')">白色</el-button>
+          </el-col>
+        </div>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <h3>自訂標題顏色：</h3>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <div class="block">
+          <el-col :sm="def_padding">
+            <el-color-picker v-model="titleColor" @change="submit()"></el-color-picker>
+          </el-col>
+        </div>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <h3>快選標題大小：</h3>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <div class="block">
+          <el-col :sm="def_padding">
+            <el-button @click="setSize(90)">90px</el-button>
+            <el-button @click="setSize(70)">70px</el-button>
+            <el-button  @click="setSize(50)">50px</el-button>
+          </el-col>
+        </div>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+          <h3>自訂標題大小：</h3>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <div class="block">
+          <el-col :sm="def_padding">
+            <el-slider v-model="titleSize"max=300></el-slider>
+          </el-col>
+        </div>
       </el-row>
     </el-main>
   </div> <!-- app -->
@@ -96,6 +150,8 @@
       return { 
         visible: false,
         liveTitle: ' -- ',
+        titleColor: '#000000',
+        titleSize: 70,
         title1: '',
         title2: '',
         title3: '',
@@ -114,7 +170,7 @@
       this.getTitle();
     },
     methods: {
-      submit(txt){
+      submit(){
         axios({
           method: 'post',
           url: '/title',
@@ -122,14 +178,16 @@
             'Content-Type': 'application/json'
           },
           data: {
-            title: txt,
+            title: this.liveTitle,
+            color: this.titleColor,
+            size: this.titleSize,
           }
         })
         .then((response) => {
           this.liveTitle = response.data.title
           this.$message({
             showClose: true,
-            message: `設定標題為 : ${response.data.title}`,
+            message: `設定標題成功！！`,
             type: 'success'
           })
         })
@@ -140,6 +198,18 @@
           })
         });
       },
+      setTitle(txt) {
+        this.liveTitle = txt;
+        this.submit();
+      },
+      setColor(color) {
+        this.titleColor = color;
+        this.submit();
+      },
+      setSize(size) {
+        this.titleSize = size;
+        this.submit();
+      },
       getTitle() {
         axios({
           method: 'get',
@@ -147,6 +217,8 @@
         })
         .then((response) => {
           this.liveTitle = response.data.title
+          this.titleColor = response.data.color
+          this.titleSize = response.data.size
           this.$message({
             showClose: true,
             message: `讀取標題成功！ : ${response.data.title}`,
