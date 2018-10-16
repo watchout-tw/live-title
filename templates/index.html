@@ -136,7 +136,7 @@
       <el-row :gutter="20">
         <div class="block">
           <el-col :sm="def_padding">
-            <el-slider v-model="titleSize"max=300></el-slider>
+            <el-slider v-model="titleSize"max=300 @change="submit()"></el-slider>
           </el-col>
         </div>
       </el-row>
