@@ -2,21 +2,36 @@
  # -*- coding: utf-8 -*-
 
 import json
-from flask import Flask
-from flask import make_response
-from flask import request
-from flask import render_template
+from flask import Flask, make_response, request, render_template, Response, redirect, url_for
 from bson import json_util
 from instance import config
 from instance import error_msg
 import datetime
-from flask import Response
-
-app = Flask(__name__)
+from werkzeug import secure_filename
+import os
 
 TITLE = u"活動即將開始"
 TITLE_COLOR = "#000000"
 TITLE_SIZE = 70
+TITLE_ACTIVE = False
+
+DATA_DEBATE = {
+    'title': u'活動即將開始',
+    'color': '#000000',
+    'size': 70,
+    'display': False
+}
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -26,16 +41,50 @@ def index():
 def enter():
     return render_template('index.html')
 
-@app.route('/test')
+@app.route('/debate')
+def debate():
+    return render_template('debate.html')
+
+@app.route('/test_back')
+def test_back():
+    return render_template('test_back.html')
+
+
+@app.route('/debate/title', methods=['GET', 'POST'])
 def test():
-    return render_template('test.html')
+    global TITLE
+    global TITLE_COLOR
+    global TITLE_SIZE
+    if request.method == 'POST':
+        data = request.get_json(silent=True)
+        DATA_DEBATE['title'] = unicode(data['title'])
+        DATA_DEBATE['color'] = unicode(data['color'])
+        DATA_DEBATE['size'] = data['size']
+        DATA_DEBATE['display'] = unicode(data['display'])
+        return generate_json(DATA_DEBATE)
+    else:
+        return generate_json(DATA_DEBATE)
+
+@app.route('/debate/photos', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return generate_json({'msg': 'OK'})
+    else:
+        files = os.listdir(app.config['UPLOAD_FOLDER'])
+        return generate_json(files)
+
 
 @app.route('/data')
 def data():
     global TITLE
     global TITLE_COLOR
     global TITLE_SIZE
-    msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE}
+    global TITLE_ACTIVE
+    msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE,'titleActive':TITLE_ACTIVE}
     return generate_json(msg)
 
 
@@ -44,12 +93,14 @@ def title():
     global TITLE
     global TITLE_COLOR
     global TITLE_SIZE
+    global TITLE_ACTIVE
     if request.method == 'POST':
         data = request.get_json(silent=True)
         TITLE = unicode(data['title'])
         TITLE_COLOR = unicode(data['color'])
         TITLE_SIZE = unicode(data['size'])
-        msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE}
+        TITLE_ACTIVE = data['titleActive']
+        msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE,'titleActive':TITLE_ACTIVE}
         return generate_json(msg)
     else:
         return render_template('title.html', title_color=TITLE_COLOR, title_size=TITLE_SIZE)

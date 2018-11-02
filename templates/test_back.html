@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Watchout Live Title</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- production version, optimized for size and speed -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- element ui -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+
+<style>
+  html, body{
+    padding: 0;
+    margin: 0;
+    font-family: "xingothic-tc", Arial, Helvetica, sans-serif;
+  }
+  .head{
+    text-align: center;
+    background-color: #50e3c2;
+    color: #FFFFFF;
+    line-height: 60px;
+    font-size: 2rem;
+    font-weight: 200;
+  }
+  .tags{
+    font-size: 1.1rem;
+  }
+  .el-color-picker__trigger{
+    width: 100px;
+  }
+  .title{
+    width: 100%;
+    text-align: left;
+    font-size: 25px;
+    height: 40px;
+    line-height: 40px;
+  }
+  .title_br{
+    margin-top: 20px;
+    border: #c6c6c6 solid 10px;
+    padding: 20px;
+  }
+</style>
+
+<body>
+{% raw %}
+  <div id="app">
+    <el-header class="head"><span>WATCHOUT LIVE TITLE</span></el-header>
+    <el-main>
+      <el-row :gutter="20">
+        <el-col :span="24">
+          <iframe src="./debate" width="100%" height="500px"></iframe>
+        </el-col>
+      </el-row>
+      <div class="title_br">
+        <el-row :gutter="20" style="margin-bottom:20px;">
+          <el-col :span="3"><div class="title">常用標題</div></el-col>
+          <template v-for="item in commons">
+          <el-col :span="3">
+            <el-button style="width:100%;" @click="setTitle(item.title)">{{item.title}}</el-button>
+          </el-col>
+          </template>
+        </el-row>
+        <el-row :gutter="20" style="margin-bottom:10px;">
+          <el-col :span="3"><div class="title">標題顏色</div></el-col>
+          <el-col :span="2"><el-button style="background-color: #000000; width: 100%;" @click="setColor('#000000')">黑色</el-button></el-col>
+          <el-col :span="2"><el-button style="background-color: #FFFFFF; width: 100%;" @click="setColor('#FFFFFF')">白色</el-button></el-col>
+          <el-col :span="10"><el-color-picker v-model="titleColor" @change="submit()"></el-color-picker></el-col>
+        </el-row>
+        <el-row :gutter="20" style="margin-bottom:10px;">
+          <el-col :span="3"><div class="title">標題大小</div></el-col>
+          <el-col :span="2"><el-button style="width:100%;" @click="setSize(90)">90px</el-button></el-col>
+          <el-col :span="2"><el-button style="width:100%;" @click="setSize(70)">70px</el-button></el-col>
+          <el-col :span="2"><el-button style="width:100%;" @click="setSize(50)">50px</el-button></el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="3"><div class="title">輸入標題</div></el-col>
+          <el-col :span="15">
+            <el-input v-model="title" placeholder="輸入標題" style="margin-bottom:10px;"></el-input>
+          </el-col >
+          <el-col :span="6">
+            <el-button type="primary" style="width:100%" @click="setTitle(title1)">送出</el-button>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="3"><div class="title">文字暫存區</div></el-col>
+          <el-col :span="21">
+            <el-input
+              type="textarea"
+              :rows="10"
+              placeholder="給你盡情先放些文字用的區域"
+              v-model="textarea"
+              style="margin-top:5px"
+              >
+            </el-input>
+          </el-col>
+        </el-row>
+      </div>
+
+
+      <el-row :gutter="20">
+        <el-col :sm="def_padding">
+            <el-upload
+              action="/photos"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove">
+              <i class="el-icon-plus"></i>
+            </el-upload>
+        </el-col>
+      </el-row>
+
+
+    </el-main>
+  </div> <!-- app -->
+{% endraw %}
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return { 
+        visible: false,
+        liveTitle: ' -- ',
+        titleColor: '#000000',
+        titleSize: 70,
+        title: '',
+        textarea: '',
+        input: '',
+        titleActive: false,
+        def_padding: {span:16,offset:4},
+        btn_padding: {span:12,offset:4},
+        commons: [
+          {title:'活動即將開始'},
+          {title:'中場休息'},
+          {title:'中午休息'},
+          {title:'謝謝收看'}       
+        ],
+        photoList: [],
+        dialogImageUrl: '',
+        dialogVisible: false
+      }
+    },
+    mounted: function () {
+      this.getTitle();
+    },
+    methods: {
+      submit(){
+
+        console.log('this.titleActive :', this.titleActive)
+        let active ='';
+
+        if (this.titleActive){
+          active = false;
+        } else {
+          active = true;
+        }
+
+        axios({
+          method: 'post',
+          url: '/title',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            title: this.liveTitle,
+            color: this.titleColor,
+            size: this.titleSize,
+            titleActive: active
+          }
+        })
+        .then((response) => {
+          this.liveTitle = response.data.title
+          this.titleActive = response.data.titleActive
+          this.$message({
+            showClose: true,
+            message: `設定標題成功！！`,
+            type: 'success'
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
+      setTitle(txt) {
+        this.liveTitle = txt;
+        this.submit();
+      },
+      setColor(color) {
+        this.titleColor = color;
+        this.submit();
+      },
+      setSize(size) {
+        this.titleSize = size;
+        this.submit();
+      },
+      getTitle() {
+        axios({
+          method: 'get',
+          url: '/data',
+        })
+        .then((response) => {
+          this.liveTitle = response.data.title
+          this.titleColor = response.data.color
+          this.titleSize = response.data.size
+          this.$message({
+            showClose: true,
+            message: `讀取標題成功！ : ${response.data.title}`,
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
+      }
+    }
+    
+  })
+</script>
+</body>
+</html>

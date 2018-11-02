@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+  <!-- IE可能不見得有效 -->
+  <META HTTP-EQUIV="EXPIRES" CONTENT="0">
+  <!-- 設定成馬上就過期 -->
+  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<title>Watchout Live Title</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="author" content="Watchout"/>
+<link rel="shortcut icon" href="" />
+<!-- production version, optimized for size and speed -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<style>
+  body {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700;
+  }
+  .main_br {
+    box-sizing: border-box;
+    border: red solid 1px;
+    width: 1920px;
+    height: 1080px;
+  }
+
+  .title {
+    width: 0px;
+    margin-left: -1400px;
+    height: 90px;
+    line-height: 90px;
+    padding-left: 20px;
+    font-size: 70px;
+    background-color: darkolivegreen;
+    opacity: 0.7;
+    margin-top: 100px;
+    -webkit-transition: width 2s; /* Safari */
+    transition: width 2s;
+    -webkit-transition-timing-function: ease;
+    transition-timing-function: ease;
+  }
+  .title_active {
+    width: 1400px;
+    margin-left: 0px;
+  }
+</style>
+
+<body>
+{% raw %}
+<div id="app"  class="main_br">
+    <div class="title" v-bind:class="{ title_active: titleActive}">{{liveTitle}}</div>
+    <span></span>
+</div> <!-- app -->
+{% endraw %}
+<script>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return {
+        titleActive: false,
+        refreshTime: 1,
+        liveTitle: null,
+        visible: false,
+      }
+    },
+    mounted: function () {
+      this.loop();
+    },
+    methods: {
+      loop(){
+        setInterval(this.getTitle, this.refreshTime * 1000);
+      },
+      getTitle() {
+        axios({
+          method: 'get',
+          url: '/data',
+        })
+        .then((response) => {
+          console.log( response.data)
+          this.liveTitle = response.data.title;
+          this.titleActive = response.data.titleActive;
+          //this.titleColor = response.data.color
+          //this.titleSize = response.data.size
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      }
+    }
+  })
+</script>
+</body>
+</html>
