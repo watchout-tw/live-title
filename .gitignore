@@ -2,3 +2,7 @@
 instance/__init__\.pyc
 
 *.pyc
+
+\.DS_Store
+
+*.png

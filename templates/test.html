@@ -43,10 +43,20 @@
     height: 40px;
     line-height: 40px;
   }
-  .title_br{
+  .area_br{
     margin-top: 20px;
     border: #c6c6c6 solid 10px;
     padding: 20px;
+  }
+  .image_item{
+    background-repeat: no-repeat;
+    background-size:contain;
+    background-position: center center;
+    background-color: #c6c6c6;
+    width: 138px;
+    height: 138px;
+    border: #c6c6c6 solid 5px;
+    border-radius: 5px;
   }
 </style>
 
@@ -60,7 +70,7 @@
           <iframe src="./debate" width="100%" height="500px"></iframe>
         </el-col>
       </el-row>
-      <div class="title_br">
+      <div class="area_br">
         <el-row :gutter="20" style="margin-bottom:20px;">
           <el-col :span="3"><div class="title">常用標題</div></el-col>
           <template v-for="item in commons">
@@ -104,21 +114,26 @@
           </el-col>
         </el-row>
       </div>
-
-
-      <el-row :gutter="20">
-        <el-col :sm="def_padding">
-            <el-upload
-              action="/photos"
-              list-type="picture-card"
-              :on-preview="handlePictureCardPreview"
-              :on-remove="handleRemove">
-              <i class="el-icon-plus"></i>
-            </el-upload>
-        </el-col>
-      </el-row>
-
-
+      <div class="area_br">
+        <el-row :gutter="10">
+            <el-col :sm="3">
+                <el-upload
+                  action="/debate/photos"
+                  list-type="picture-card"
+                  :on-preview="handlePictureCardPreview"
+                  :on-remove="handleRemove"
+                  :on-success="handlePictureUploaded">
+                  <i class="el-icon-plus"></i>
+                </el-upload>
+            </el-col>
+            <el-col :sm="3" v-for="item in livePhotos">
+              <div 
+                class="image_item"
+                v-bind:style="{ backgroundImage: 'url(http://127.0.0.1:8000/static/uploads/' + item + ')'}">
+              </div>
+            </el-col>
+        </el-row>
+      </div>
     </el-main>
   </div> <!-- app -->
 {% endraw %}
@@ -129,6 +144,8 @@
       return { 
         visible: false,
         liveTitle: ' -- ',
+        livePhotos: [],
+        selectLivePhotos: null,
         titleColor: '#000000',
         titleSize: 70,
         title: '',
@@ -150,10 +167,10 @@
     },
     mounted: function () {
       this.getTitle();
+      this.getPhotos();
     },
     methods: {
       submit(){
-
         console.log('this.titleActive :', this.titleActive)
         let active ='';
 
@@ -225,12 +242,36 @@
           })
         });
       },
+      getPhotos() {
+        axios({
+          method: 'get',
+          url: '/debate/photos',
+        })
+        .then((response) => {
+          this.livePhotos = response.data
+          this.$message({
+            showClose: true,
+            message: '讀取照片成功！',
+          })
+        })
+        .catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        });
+      },
       handleRemove(file, fileList) {
         console.log(file, fileList);
       },
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
+      },
+      handlePictureUploaded(){
+        this.dialogImageUrl = '';
+        this.dialogVisible = false;
+        this.getPhotos();
       }
     }
     

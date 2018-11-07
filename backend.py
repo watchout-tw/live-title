@@ -6,7 +6,7 @@ from flask import Flask, make_response, request, render_template, Response, redi
 from bson import json_util
 from instance import config
 from instance import error_msg
-import datetime
+import time
 from werkzeug import secure_filename
 import os
 
@@ -22,16 +22,36 @@ DATA_DEBATE = {
     'display': False
 }
 
+DEBATE_ALERT_FOLDER = 'static/dabate/alert'
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
+app.config['DEBATE_ALERT_FOLDER'] = DEBATE_ALERT_FOLDER
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+def get_alert_photo():
+    files = os.listdir(app.config['DEBATE_ALERT_FOLDER'])
+    files.sort()
+    file = files[-1]
+    return (app.config['DEBATE_ALERT_FOLDER']+'/'+file)
+
+def save_alert_photo(file):
+    ts = time.time()
+    ts = int(ts*1000000)
+    DATA_DEBATE_ALERT['img'] = str(ts) + '.png'
+    file.save(os.path.join(app.config['DEBATE_ALERT_FOLDER'], DATA_DEBATE_ALERT['img']))
+
+
+DATA_DEBATE_ALERT = {
+    'img': get_alert_photo(),
+    'display': False
+}
 
 @app.route('/')
 def index():
@@ -45,9 +65,9 @@ def enter():
 def debate():
     return render_template('debate.html')
 
-@app.route('/test_back')
+@app.route('/debate_back')
 def test_back():
-    return render_template('test_back.html')
+    return render_template('debate_back.html')
 
 
 @app.route('/debate/title', methods=['GET', 'POST'])
@@ -64,6 +84,32 @@ def test():
         return generate_json(DATA_DEBATE)
     else:
         return generate_json(DATA_DEBATE)
+
+@app.route('/debate/data/alert', methods=['GET', 'POST'])
+def debate_alert():
+    global DATA_DEBATE_ALERT
+    if request.method == 'POST':
+        data = request.get_json(silent=True)
+        DATA_DEBATE_ALERT['display'] = data['display']
+        DATA_DEBATE_ALERT['img'] = get_alert_photo()
+        return generate_json(DATA_DEBATE_ALERT)
+    else:
+        DATA_DEBATE_ALERT['img'] = get_alert_photo()
+        return generate_json(DATA_DEBATE_ALERT)
+
+@app.route('/debate/data/alert/photo', methods=['GET', 'POST'])
+def debate_alert_photo():
+    global DATA_DEBATE_ALERT
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            save_alert_photo(file)
+            return generate_json(DATA_DEBATE_ALERT)
+    else:
+        DATA_DEBATE_ALERT['img'] = get_alert_photo()
+        return generate_json(DATA_DEBATE_ALERT)
+
+
 
 @app.route('/debate/photos', methods=['GET', 'POST'])
 def upload_file():
