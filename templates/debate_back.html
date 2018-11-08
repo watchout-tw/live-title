@@ -93,7 +93,42 @@
           <el-col :sm="24"><h1>(1) FACK CHECK</h1></el-col>
         </el-row>
         <el-row :gutter="20">
-            <el-col :sm="4" class="center">
+            <el-col :sm="3" class="center">
+              <h1>上傳圖檔</h1>
+              <el-upload
+                action="/debate/data/alert/photo"
+                list-type="picture-card"
+                :on-preview="handlePictureCardPreview"
+                :show-file-list="false"
+                :on-remove="handleRemove"
+                :on-success="reload">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-col>
+            <el-col :sm="5" class="center">
+                <h1>目前圖片</h1>
+                <div 
+                  class="image_item"
+                  v-bind:style="{ backgroundImage: 'url(' + dabateAlert.img + ')'}">
+                </div>
+              </el-col>
+            <el-col :sm="2" class="center">
+              <h1>秒數</h1>
+              <el-input v-model="dabateAlert.countDown" placeholder="會在畫面上停留多久" disabled></el-input>
+            </el-col>
+            <el-col :sm="14" style=" padding-top: 50px;padding-left: 50px;">
+              <el-button  v-if="dabateAlert.display" class="c-btn-big" @click="showDebateAlert" disabled>{{dabateAlert.currentCountDown}}</el-button>
+              <el-button  v-else type="primary" class="c-btn-big" @click="showDebateAlert">送出</el-button>
+              <el-button type="danger" class="c-btn-big" @click="hiddenDebateAlert" style="margin-left:50px;">終止</el-button>
+            </el-col>
+        </el-row>
+      </div>
+      <div class="area_br">
+        <el-row :gutter="10">
+          <el-col :sm="24"><h1>(2) Question </h1></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :sm="3" class="center">
               <h1>上傳圖檔</h1>
               <el-upload
                 action="/debate/data/alert/photo"
@@ -112,11 +147,18 @@
                   v-bind:style="{ backgroundImage: 'url(' + dabateAlert.img + ')'}">
                 </div>
               </el-col>
-            <el-col :sm="4" class="center">
-              <h1>持續秒數</h1>
+            <el-col :sm="8" class="center">
+              <h1>Q標題</h1>
+              <el-input
+                type="textarea"
+                :rows="5"
+                placeholder="Q標題文字"
+                v-model="dabateQuestion.title">
+              </el-input>
+              <h2>秒數</h2>
               <el-input v-model="dabateAlert.countDown" placeholder="會在畫面上停留多久" disabled></el-input>
             </el-col>
-            <el-col :sm="12" style=" padding-top: 50px;padding-left: 50px;">
+            <el-col :sm=9 style=" padding-top: 50px;padding-left: 50px;">
               <el-button  v-if="dabateAlert.display" class="c-btn-big" @click="showDebateAlert" disabled>{{dabateAlert.currentCountDown}}</el-button>
               <el-button  v-else type="primary" class="c-btn-big" @click="showDebateAlert">送出</el-button>
               <el-button type="danger" class="c-btn-big" @click="hiddenDebateAlert" style="margin-left:50px;">終止</el-button>
@@ -197,6 +239,13 @@
       return { 
         dabateAlert: {
           img:'',
+          display: false,
+          countDown: 3,
+          currentCountDown: 0
+        },
+        dabateQuestion: {
+          img:'',
+          title: '',
           display: false,
           countDown: 5,
           currentCountDown: 0

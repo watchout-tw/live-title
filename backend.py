@@ -23,11 +23,13 @@ DATA_DEBATE = {
 }
 
 DEBATE_ALERT_FOLDER = 'static/dabate/alert'
+DEBATE_Q_FOLDER = 'static/dabate/question'
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['DEBATE_ALERT_FOLDER'] = DEBATE_ALERT_FOLDER
+app.config['DEBATE_Q_FOLDER'] = DEBATE_Q_FOLDER
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -47,9 +49,27 @@ def save_alert_photo(file):
     DATA_DEBATE_ALERT['img'] = str(ts) + '.png'
     file.save(os.path.join(app.config['DEBATE_ALERT_FOLDER'], DATA_DEBATE_ALERT['img']))
 
+def get_q_photo():
+    files = os.listdir(app.config['DEBATE_Q_FOLDER'])
+    files.sort()
+    file = files[-1]
+    return (app.config['DEBATE_Q_FOLDER']+'/'+file)
+
+def save_q_photo(file):
+    ts = time.time()
+    ts = int(ts*1000000)
+    DATA_Q_ALERT['img'] = str(ts) + '.png'
+    file.save(os.path.join(app.config['DEBATE_Q_FOLDER'], DATA_Q_ALERT['img']))
+
 
 DATA_DEBATE_ALERT = {
     'img': get_alert_photo(),
+    'display': False
+}
+
+DATA_Q_ALERT = {
+    'title': 'Q_TITLE',
+    'img': get_q_photo(),
     'display': False
 }
 
@@ -109,19 +129,29 @@ def debate_alert_photo():
         DATA_DEBATE_ALERT['img'] = get_alert_photo()
         return generate_json(DATA_DEBATE_ALERT)
 
+@app.route('/debate/data/question', methods=['GET', 'POST'])
+def debate_question():
+    global DATA_Q_ALERT
+    if request.method == 'POST':
+        data = request.get_json(silent=True)
+        DATA_Q_ALERT['display'] = data['display']
+        DATA_Q_ALERT['img'] = get_q_photo()
+        return generate_json(DATA_Q_ALERT)
+    else:
+        DATA_Q_ALERT['img'] = get_q_photo()
+        return generate_json(DATA_Q_ALERT)
 
-
-@app.route('/debate/photos', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/debate/data/question/photo', methods=['GET', 'POST'])
+def debate_question_photo():
+    global DATA_Q_ALERT
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return generate_json({'msg': 'OK'})
+            save_q_photo(file)
+            return generate_json(DATA_Q_ALERT)
     else:
-        files = os.listdir(app.config['UPLOAD_FOLDER'])
-        return generate_json(files)
+        DATA_Q_ALERT['img'] = get_q_photo()
+        return generate_json(DATA_Q_ALERT)
 
 
 @app.route('/data')
