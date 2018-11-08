@@ -14,7 +14,6 @@ from threading import Timer
 TITLE = u"活動即將開始"
 TITLE_COLOR = "#000000"
 TITLE_SIZE = 70
-TITLE_ACTIVE = False
 
 DATA_DEBATE = {
     'title': u'活動即將開始',
@@ -315,8 +314,7 @@ def data():
     global TITLE
     global TITLE_COLOR
     global TITLE_SIZE
-    global TITLE_ACTIVE
-    msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE,'titleActive':TITLE_ACTIVE}
+    msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE}
     return generate_json(msg)
 
 
@@ -325,14 +323,12 @@ def title():
     global TITLE
     global TITLE_COLOR
     global TITLE_SIZE
-    global TITLE_ACTIVE
     if request.method == 'POST':
         data = request.get_json(silent=True)
         TITLE = unicode(data['title'])
         TITLE_COLOR = unicode(data['color'])
         TITLE_SIZE = unicode(data['size'])
-        TITLE_ACTIVE = data['titleActive']
-        msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE,'titleActive':TITLE_ACTIVE}
+        msg = {'title':TITLE,'color':TITLE_COLOR,'size':TITLE_SIZE}
         return generate_json(msg)
     else:
         return render_template('title.html', title_color=TITLE_COLOR, title_size=TITLE_SIZE)

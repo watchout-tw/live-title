@@ -22,7 +22,20 @@
   html, body{
     padding: 0;
     margin: 0;
+    color: #606266;
     font-family: "xingothic-tc", Arial, Helvetica, sans-serif;
+  }
+  .preview{
+    position: fixed;
+    z-index: -1;
+    top: 65px;
+    left: 0px;
+    width:1920px;
+    height:1080px;
+    background-image: url("./static/transparent.jpg");
+    opacity: 1.0;
+    transform: scale(0.6);
+    transform-origin:0 0;
   }
   .head{
     text-align: center;
@@ -45,14 +58,7 @@
   <div id="app">
     <el-header class="head"><span>WATCHOUT LIVE TITLE</span></el-header>
     <el-main>
-      <el-row :gutter="20">
-        <el-col :sm="def_padding">
-            <el-card shadow="always" style="background-color: #c6c6c6;">
-                <div v-bind:style="{ color: titleColor, fontSize: titleSize + 'px' }">{{liveTitle}}</div>
-                <h4>標題大小：{{titleSize}}px | 標題顏色：{{titleColor}}</h4>
-            </el-card>
-          </el-col>
-      </el-row>
+      <iframe src="./title" class="preview" scrolling="no"></iframe>
       <el-row :gutter="20" style="margin-top:2rem;">
         <el-col :sm="btn_padding" style="margin-bottom:20px;">
           <el-input v-model="title1" placeholder="輸入標題"></el-input>
