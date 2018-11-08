@@ -32,12 +32,15 @@
   }
 
   .debate_bg {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 1920px;
     height: 1080px;
-    -webkit-transition: opacity 0.1s linear;
-    -moz-transition: opacity 0.1s linear;
-    -o-transition: opacity 0.1s linear;
-    transition: opacity 0.1s linear;
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
     opacity:0;
     filter:alpha(opacity=0);
   }
@@ -45,15 +48,50 @@
     opacity:100;
     filter:alpha(opacity=100);
   }
+  .lv_alert {
+    z-index: 100;
+  }
+  .lv_question {
+    z-index: 101;
+  }
+  .lv_answer {
+    z-index: 102;
+  }
+  .lv_comment{
+    z-index: 103;
+  }
+  .qTitle{
+    position: fixed;
+    top: 768px;
+    left: 425px;
+    font-size: 60px;
+    font-weight: 300;
+    color: white;
+  }
 </style>
 
 <body>
 {% raw %}
 <div id="app"  class="main_br">
     <div 
-      class="debate_bg" 
-      v-bind:class="{ debate_bg_active: dabateAlert.display}"
-      v-bind:style="{ backgroundImage: 'url(' + dabateAlert.img + ')'}"></div>
+      class="debate_bg lv_alert" 
+      v-bind:class="{ debate_bg_active: debateAlert.display}"
+      v-bind:style="{ backgroundImage: 'url(' + debateAlert.img + ')'}"></div>
+    <div 
+      class="debate_bg lv_question" 
+      v-bind:class="{ debate_bg_active: debateQuestion.display}"
+      v-bind:style="{ backgroundImage: 'url(' + debateQuestion.img + ')'}">
+      <div class="qTitle"v-html="debateQuestion.title"></div>
+    </div>
+    <div 
+      class="debate_bg lv_answer" 
+      v-bind:class="{ debate_bg_active: debateAnswer.display}"
+      v-bind:style="{ backgroundImage: 'url(' + debateAnswer.img + ')'}"></div>
+    <div 
+      class="debate_bg lv_comment" 
+      v-bind:class="{ debate_bg_active: debateComment.display}"
+      v-bind:style="{ backgroundImage: 'url(' + debateComment.img + ')'}">
+      <div class="qTitle"v-html="debateComment.title"></div>
 </div> <!-- app -->
 {% endraw %}
 <script>
@@ -61,14 +99,25 @@
     el: '#app',
     data: function () {
       return {
-        dabateAlert: {
+        debateAlert: {
           img:'',
           display: false
         },
-        titleActive: false,
+        debateQuestion: {
+          img:'',
+          title: '',
+          display: false
+        },
+        debateAnswer: {
+          img:'',
+          display: false
+        },
+        debateComment: {
+          img:'',
+          title: '',
+          display: false
+        },
         refreshTime: 1,
-        liveTitle: null,
-        visible: false,
       }
     },
     mounted: function () {
@@ -76,16 +125,19 @@
     },
     methods: {
       loop(){
-        setInterval(this.getDebateAlert, this.refreshTime * 1000);
+        setInterval(this.getInfo, this.refreshTime * 1000);
       },
-      getDebateAlert() {
+      getInfo() {
         axios({
           method: 'get',
-          url: '/debate/data/alert',
+          url: '/debate/data',
         })
         .then((response) => {
-          this.dabateAlert.img = response.data.img;
-          this.dabateAlert.display = response.data.display;
+          console.log('response', response.data)
+          this.debateAlert = response.data.debateAlert;
+          this.debateQuestion = response.data.debateQuestion;
+          this.debateAnswer = response.data.debateAnswer;
+          this.debateComment = response.data.debateComment;
         })
         .catch((error) => {
           console.log(error)

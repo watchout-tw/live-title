@@ -58,14 +58,14 @@
     border-radius: 5px;
   }
   .c-btn-big{
-    width: 150px;
-    height: 150px;
-    font-size: 40px;
+    width: 120px;
+    height: 120px;
+    font-size: 30px;
   }
   .preview{
     position: fixed;
     z-index: -1;
-    top: 80px;
+    top: 65px;
     left: 0px;
     width:1920px;
     height:1080px;
@@ -93,15 +93,12 @@
           <el-col :sm="24"><h1>(1) FACK CHECK</h1></el-col>
         </el-row>
         <el-row :gutter="20">
-            <el-col :sm="3" class="center">
+            <el-col :sm="4" class="center">
               <h1>上傳圖檔</h1>
               <el-upload
                 action="/debate/data/alert/photo"
                 list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :show-file-list="false"
-                :on-remove="handleRemove"
-                :on-success="reload">
+                :show-file-list="false">
                 <i class="el-icon-plus"></i>
               </el-upload>
             </el-col>
@@ -109,17 +106,17 @@
                 <h1>目前圖片</h1>
                 <div 
                   class="image_item"
-                  v-bind:style="{ backgroundImage: 'url(' + dabateAlert.img + ')'}">
+                  v-bind:style="{ backgroundImage: 'url(' + debateAlert.img + ')'}">
                 </div>
               </el-col>
-            <el-col :sm="2" class="center">
+            <el-col :sm="3" class="center">
               <h1>秒數</h1>
-              <el-input v-model="dabateAlert.countDown" placeholder="會在畫面上停留多久" disabled></el-input>
+              <el-input v-model="debateAlert.countDown" placeholder="會在畫面上停留多久" type="number"></el-input>
             </el-col>
-            <el-col :sm="14" style=" padding-top: 50px;padding-left: 50px;">
-              <el-button  v-if="dabateAlert.display" class="c-btn-big" @click="showDebateAlert" disabled>{{dabateAlert.currentCountDown}}</el-button>
+            <el-col :sm="12" style=" padding-top: 50px;padding-left: 50px;">
+              <el-button  v-if="debateAlert.display" class="c-btn-big" disabled>{{debateAlert.currentCountDown}}</el-button>
               <el-button  v-else type="primary" class="c-btn-big" @click="showDebateAlert">送出</el-button>
-              <el-button type="danger" class="c-btn-big" @click="hiddenDebateAlert" style="margin-left:50px;">終止</el-button>
+              <el-button type="danger" class="c-btn-big" @click="hiddenDebateAlert" style="margin-left:30px;">終止</el-button>
             </el-col>
         </el-row>
       </div>
@@ -128,15 +125,12 @@
           <el-col :sm="24"><h1>(2) Question </h1></el-col>
         </el-row>
         <el-row :gutter="20">
-            <el-col :sm="3" class="center">
+            <el-col :sm="4" class="center">
               <h1>上傳圖檔</h1>
               <el-upload
-                action="/debate/data/alert/photo"
+                action="/debate/data/question/photo"
                 list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :show-file-list="false"
-                :on-remove="handleRemove"
-                :on-success="reload">
+                :show-file-list="false">
                 <i class="el-icon-plus"></i>
               </el-upload>
             </el-col>
@@ -144,7 +138,7 @@
                 <h1>目前圖片</h1>
                 <div 
                   class="image_item"
-                  v-bind:style="{ backgroundImage: 'url(' + dabateAlert.img + ')'}">
+                  v-bind:style="{ backgroundImage: 'url(' + debateQuestion.img + ')'}">
                 </div>
               </el-col>
             <el-col :sm="8" class="center">
@@ -153,79 +147,86 @@
                 type="textarea"
                 :rows="5"
                 placeholder="Q標題文字"
-                v-model="dabateQuestion.title">
+                v-model="debateQuestion.title">
               </el-input>
               <h2>秒數</h2>
-              <el-input v-model="dabateAlert.countDown" placeholder="會在畫面上停留多久" disabled></el-input>
+              <el-input v-model="debateQuestion.countDown" placeholder="會在畫面上停留多久" type="number"></el-input>
             </el-col>
-            <el-col :sm=9 style=" padding-top: 50px;padding-left: 50px;">
-              <el-button  v-if="dabateAlert.display" class="c-btn-big" @click="showDebateAlert" disabled>{{dabateAlert.currentCountDown}}</el-button>
-              <el-button  v-else type="primary" class="c-btn-big" @click="showDebateAlert">送出</el-button>
-              <el-button type="danger" class="c-btn-big" @click="hiddenDebateAlert" style="margin-left:50px;">終止</el-button>
+            <el-col :sm="8" style=" padding-top: 50px;padding-left: 50px;">
+              <el-button  v-if="debateQuestion.display" class="c-btn-big" disabled>{{debateQuestion.currentCountDown}}</el-button>
+              <el-button  v-else type="primary" class="c-btn-big" @click="showDebateQuestion">送出</el-button>
+              <el-button type="danger" class="c-btn-big" @click="hiddenDebateQuestion" style="margin-left:30px;">終止</el-button>
             </el-col>
-        </el-row>
-      </div>
-      <div class="area_br">
-        <el-row :gutter="20" style="margin-bottom:20px;">
-          <el-col :span="3"><div class="title">常用標題</div></el-col>
-          <template v-for="item in commons">
-          <el-col :span="3">
-            <el-button style="width:100%;" @click="setTitle(item.title)">{{item.title}}</el-button>
-          </el-col>
-          </template>
-        </el-row>
-        <el-row :gutter="20" style="margin-bottom:10px;">
-          <el-col :span="3"><div class="title">標題顏色</div></el-col>
-          <el-col :span="2"><el-button style="background-color: #000000; width: 100%;" @click="setColor('#000000')">黑色</el-button></el-col>
-          <el-col :span="2"><el-button style="background-color: #FFFFFF; width: 100%;" @click="setColor('#FFFFFF')">白色</el-button></el-col>
-          <el-col :span="10"><el-color-picker v-model="titleColor" @change="submit()"></el-color-picker></el-col>
-        </el-row>
-        <el-row :gutter="20" style="margin-bottom:10px;">
-          <el-col :span="3"><div class="title">標題大小</div></el-col>
-          <el-col :span="2"><el-button style="width:100%;" @click="setSize(90)">90px</el-button></el-col>
-          <el-col :span="2"><el-button style="width:100%;" @click="setSize(70)">70px</el-button></el-col>
-          <el-col :span="2"><el-button style="width:100%;" @click="setSize(50)">50px</el-button></el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="3"><div class="title">輸入標題</div></el-col>
-          <el-col :span="15">
-            <el-input v-model="title" placeholder="輸入標題" style="margin-bottom:10px;"></el-input>
-          </el-col >
-          <el-col :span="6">
-            <el-button type="primary" style="width:100%" @click="setTitle(title1)">送出</el-button>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="3"><div class="title">文字暫存區</div></el-col>
-          <el-col :span="21">
-            <el-input
-              type="textarea"
-              :rows="10"
-              placeholder="給你盡情先放些文字用的區域"
-              v-model="textarea"
-              style="margin-top:5px"
-              >
-            </el-input>
-          </el-col>
         </el-row>
       </div>
       <div class="area_br">
         <el-row :gutter="10">
-            <el-col :sm="3">
-                <el-upload
-                  action="/debate/photos"
-                  list-type="picture-card"
-                  :on-preview="handlePictureCardPreview"
-                  :on-remove="handleRemove"
-                  :on-success="reload">
-                  <i class="el-icon-plus"></i>
-                </el-upload>
+          <el-col :sm="24"><h1>(3) ANSWER</h1></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :sm="4" class="center">
+              <h1>上傳圖檔</h1>
+              <el-upload
+                action="/debate/data/answer/photo"
+                list-type="picture-card"
+                :show-file-list="false">
+                <i class="el-icon-plus"></i>
+              </el-upload>
             </el-col>
-            <el-col :sm="3" v-for="item in livePhotos">
-              <div 
-                class="image_item"
-                v-bind:style="{ backgroundImage: 'url(http://127.0.0.1:8000/static/uploads/' + item + ')'}">
-              </div>
+            <el-col :sm="5" class="center">
+                <h1>目前圖片</h1>
+                <div 
+                  class="image_item"
+                  v-bind:style="{ backgroundImage: 'url(' + debateAnswer.img + ')'}">
+                </div>
+              </el-col>
+            <el-col :sm="3" class="center">
+              <h1>秒數</h1>
+              <el-input v-model="debateAnswer.countDown" placeholder="會在畫面上停留多久" type="number"></el-input>
+            </el-col>
+            <el-col :sm="12" style=" padding-top: 50px;padding-left: 50px;">
+              <el-button  v-if="debateAnswer.display" class="c-btn-big" disabled>{{debateAnswer.currentCountDown}}</el-button>
+              <el-button  v-else type="primary" class="c-btn-big" @click="showDebateAnswer">送出</el-button>
+              <el-button type="danger" class="c-btn-big" @click="hiddenDebateAnswer" style="margin-left:30px;">終止</el-button>
+            </el-col>
+        </el-row>
+      </div>
+      <div class="area_br">
+        <el-row :gutter="10">
+          <el-col :sm="24"><h1>(4) COMMENT </h1></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :sm="4" class="center">
+              <h1>上傳圖檔</h1>
+              <el-upload
+                action="/debate/data/comment/photo"
+                list-type="picture-card"
+                :show-file-list="false">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-col>
+            <el-col :sm="4" class="center">
+                <h1>目前圖片</h1>
+                <div 
+                  class="image_item"
+                  v-bind:style="{ backgroundImage: 'url(' + debateComment.img + ')'}">
+                </div>
+              </el-col>
+            <el-col :sm="8" class="center">
+              <h1>C標題</h1>
+              <el-input
+                type="textarea"
+                :rows="5"
+                placeholder="C標題文字"
+                v-model="debateComment.title">
+              </el-input>
+              <h2>秒數</h2>
+              <el-input v-model="debateComment.countDown" placeholder="會在畫面上停留多久" type="number"></el-input>
+            </el-col>
+            <el-col :sm="8" style=" padding-top: 50px;padding-left: 50px;">
+              <el-button  v-if="debateComment.display" class="c-btn-big" disabled>{{debateComment.currentCountDown}}</el-button>
+              <el-button  v-else type="primary" class="c-btn-big" @click="showDebateComment">送出</el-button>
+              <el-button type="danger" class="c-btn-big" @click="hiddenDebateComment" style="margin-left:30px;">終止</el-button>
             </el-col>
         </el-row>
       </div>
@@ -236,185 +237,165 @@
   new Vue({
     el: '#app',
     data: function () {
-      return { 
-        dabateAlert: {
+      return {
+        debateAlert: {
           img:'',
           display: false,
-          countDown: 3,
-          currentCountDown: 0
+          currentCountDown: 0,
+          countDown: 4,
         },
-        dabateQuestion: {
+        debateQuestion: {
           img:'',
           title: '',
           display: false,
-          countDown: 5,
-          currentCountDown: 0
+          currentCountDown: 0,
+          countDown: 10
         },
-        visible: false,
-        liveTitle: ' -- ',
-        livePhotos: [],
-        selectLivePhotos: null,
-        titleColor: '#000000',
-        titleSize: 70,
-        title: '',
-        textarea: '',
-        input: '',
-        titleActive: false,
-        def_padding: {span:16,offset:4},
-        btn_padding: {span:12,offset:4},
-        commons: [
-          {title:'活動即將開始'},
-          {title:'中場休息'},
-          {title:'中午休息'},
-          {title:'謝謝收看'}       
-        ],
-        photoList: [],
-        dialogImageUrl: '',
-        dialogVisible: false
+        debateAnswer: {
+          img:'',
+          display: false,
+          currentCountDown: 0,
+          countDown: 15
+        },
+        debateComment: {
+          img:'',
+          title: '',
+          display: false,
+          currentCountDown: 0,
+          countDown: 6
+        },
       }
     },
     mounted: function () {
-      this.getTitle();
-      this.getPhotos();
-      this.getDebateAlert();
+      this.timer();
     },
     methods: {
-      submit(){
-        console.log('this.titleActive :', this.titleActive)
-        let active ='';
-
-        if (this.titleActive){
-          active = false;
-        } else {
-          active = true;
-        }
-        axios({
-          method: 'post',
-          url: '/title',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          data: {
-            title: this.liveTitle,
-            color: this.titleColor,
-            size: this.titleSize,
-            titleActive: active
-          }
-        })
-        .then((response) => {
-          this.liveTitle = response.data.title
-          this.titleActive = response.data.titleActive
-          this.$message({
-            showClose: true,
-            message: `設定標題成功！！`,
-            type: 'success'
-          })
-        })
-        .catch((error) => {
-          this.showError(error);
-        });
-      },
-      setTitle(txt) {
-        this.liveTitle = txt;
-        this.submit();
-      },
-      setColor(color) {
-        this.titleColor = color;
-        this.submit();
-      },
-      setSize(size) {
-        this.titleSize = size;
-        this.submit();
-      },
-      getTitle() {
-        axios({
-          method: 'get',
-          url: '/data',
-        })
-        .then((response) => {
-          this.liveTitle = response.data.title
-          this.titleColor = response.data.color
-          this.titleSize = response.data.size
-          this.$message({
-            showClose: true,
-            message: `讀取標題成功！ : ${response.data.title}`,
-          })
-        })
-        .catch((error) => {
-          this.showError(error);
-        });
-      },
-      getDebateAlert() {
-        axios({
-          method: 'get',
-          url: '/debate/data/alert',
-        })
-        .then((response) => {
-          this.dabateAlert.img = response.data.img;
-          this.dabateAlert.display = response.data.display;
-          const h = this.$createElement;
-          this.$notify({
-          title: '更新素材',
-            message: h('h3', { style: 'color: teal'}, '更新 (1) FACT CHECK 素材成功')
-          });
-        })
-        .catch((error) => {
-          console.log(error)
-          this.showError(error);
-        });
-      },
       showDebateAlert(){
-        axios({
-          method: 'post',
-          url: '/debate/data/alert',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          data: {
-            display: true
-          }
-        })
-        .then((response) => {
-          this.dabateAlert.img = response.data.img;
-          this.dabateAlert.display = response.data.display;
-          const h = this.$createElement;
-          this.$notify({
-          title: 'FACT CHECK',  
-            message: h('h3', { style: 'color: #409EFF'}, '顯示FACT CHECK '+ this.dabateAlert.countDown + '秒')
-          });
-          let self = this;
-          this.dabateAlert.currentCountDown = this.dabateAlert.countDown
-          let countDown = setInterval(function(){
-            self.dabateAlert.currentCountDown--;
-            if (self.dabateAlert.currentCountDown === 0) {
-              self.hiddenDebateAlert();
-              clearInterval(countDown);
-            }
-          }, 1000);
-        })
-        .catch((error) => {
-          console.log(error)
-          this.showError(error);
-        });
+        this.doActionInfo('alert', true, this.debateAlert);
       },
       hiddenDebateAlert(){
+        this.doActionInfo('alert', false, this.debateAlert);
+      },
+      showDebateQuestion(){
+        this.doActionInfo('question', true, this.debateQuestion);
+      },
+      hiddenDebateQuestion(){
+        this.doActionInfo('question', false, this.debateQuestion);
+      },
+      showDebateAnswer(){
+        this.doActionInfo('answer', true, this.debateAnswer);
+      },
+      hiddenDebateAnswer(){
+        this.doActionInfo('answer', false, this.debateAnswer);
+      },
+      showDebateComment(){
+        this.doActionInfo('comment', true, this.debateComment);
+      },
+      hiddenDebateComment(){
+        this.doActionInfo('comment', false, this.debateComment);
+      },
+      getInfo() {
+        axios({
+          method: 'get',
+          url: '/debate/data',
+        })
+        .then((response) => {
+          this.debateAlert.img = response.data.debateAlert.img;
+          this.debateAlert.display = response.data.debateAlert.display;
+          this.debateAlert.currentCountDown = response.data.debateAlert.currentCountDown;
+ 
+          this.debateQuestion.img = response.data.debateQuestion.img;
+          this.debateQuestion.display = response.data.debateQuestion.display;
+          this.debateQuestion.currentCountDown = response.data.debateQuestion.currentCountDown;
+
+          this.debateAnswer.img = response.data.debateAnswer.img;
+          this.debateAnswer.display = response.data.debateAnswer.display;
+          this.debateAnswer.currentCountDown = response.data.debateAnswer.currentCountDown;
+
+          this.debateComment.img = response.data.debateComment.img;
+          this.debateComment.display = response.data.debateComment.display;
+          this.debateComment.currentCountDown = response.data.debateComment.currentCountDown;
+
+        })
+        .catch((error) => {
+          console.log(error)
+        });
+      },
+      doActionInfo(action, display, obj){
+        let msg = '';
+        let url = '';
+        let msgColor = '#409EFF';
+        let title = null;
+        let countDown = obj.countDown;    
+        let currentCountDown = 0;
+        switch (action) {
+          case 'alert':
+            url = '/debate/data/alert';
+            if(display) {
+              msg = '(1) FACT CHECK 顯示'+ obj.countDown + '秒';
+              currentCountDown = obj.countDown;
+            } else {
+              msgColor = '#f56c6c';
+              msg = '(1) FACT CHECK 關閉顯示';
+              currentCountDown = 0;
+            }
+            break;
+          case 'question':
+            url = '/debate/data/question';
+            title = obj.title
+            if (display) {
+              msg = '(2) Question 顯示'+ obj.countDown + '秒';
+              currentCountDown = obj.countDown;
+            } else {
+              msgColor = '#f56c6c';
+              msg = '(2) Question 關閉顯示';
+              currentCountDown = 0;
+            }
+            break;
+          case 'answer':
+            url = '/debate/data/answer';
+            if(display) {
+              msg = '(3) ANSWER 顯示'+ obj.countDown + '秒';
+              currentCountDown = obj.countDown;
+            } else {
+              msgColor = '#f56c6c';
+              msg = '(3) ANSWER 關閉顯示';
+              currentCountDown = 0;
+            }
+            break;
+          case 'comment':
+            url = '/debate/data/comment';
+            title = obj.title
+            if (display) {
+              msg = '(4) Comment 顯示'+ obj.countDown + '秒';
+              currentCountDown =  parseInt(obj.countDown);
+            } else {
+              msgColor = '#f56c6c';
+              msg = '(4) Comment 關閉顯示';
+              currentCountDown = 0;
+            }
+            break;
+        };
+        let dataD = {
+          display: display,
+          title: title,
+          countDown: countDown,
+          currentCountDown: currentCountDown
+        }
+        console.log('data :', dataD)
         axios({
           method: 'post',
-          url: '/debate/data/alert',
+          url: url,
           headers: {
             'Content-Type': 'application/json'
           },
-          data: {
-            display: false
-          }
+          data: dataD
         })
         .then((response) => {
-          this.dabateAlert.img = response.data.img;
-          this.dabateAlert.display = response.data.display;
           const h = this.$createElement;
           this.$notify({
-          title: 'FACT CHECK',  
-            message: h('h3', { style: 'color: #f56c6c'}, '關閉 FACT CHECK')
+          title: 'Action',  
+            message: h('h3', { style: `color: ${msgColor}`}, msg)
           });
         })
         .catch((error) => {
@@ -422,35 +403,11 @@
           this.showError(error);
         });
       },
-      getPhotos() {
-        axios({
-          method: 'get',
-          url: '/debate/photos',
-        })
-        .then((response) => {
-          this.livePhotos = response.data
-          this.$message({
-            showClose: true,
-            message: '讀取照片成功！',
-          })
-        })
-        .catch((error) => {
-          console.log(error);
-          this.showError(error);
-        });
-      },
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePictureCardPreview(file) {
-        this.dialogImageUrl = file.url;
-        this.dialogVisible = true;
-      },
-      reload(){
-        this.dialogImageUrl = '';
-        this.dialogVisible = false;
-        this.getPhotos();
-        this.getDebateAlert();
+      timer() {
+        let self = this;
+        setInterval(function(){
+          self.getInfo();
+        }, 1000);
       },
       showError(error){
         const h = this.$createElement;
