@@ -68,6 +68,14 @@
     font-weight: 700;
     color: white;
   }
+  .cTitle {
+    position: fixed;
+    top: 882px;
+    left: 425px;
+    font-size: 60px;
+    font-weight: 700;
+    color: white;
+  }
 </style>
 
 <body>
@@ -91,7 +99,7 @@
       class="debate_bg lv_comment" 
       v-bind:class="{ debate_bg_active: debateComment.display}"
       v-bind:style="{ backgroundImage: 'url(' + debateComment.img + ')'}">
-      <div class="qTitle"v-html="debateComment.title"></div>
+      <div class="cTitle"v-html="debateComment.title"></div>
 </div> <!-- app -->
 {% endraw %}
 <script>
