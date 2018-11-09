@@ -219,10 +219,12 @@ def debate_question():
     global DATA_DEBATE_ALERT
     global DATA_DEBATE_Q
     global DATA_DEBATE_ANSWER
+    global DATA_DEBATE_COMMENT
     if request.method == 'POST':
         data = request.get_json(silent=True)
-        if DATA_DEBATE_ANSWER['display'] is False: 
+        if DATA_DEBATE_COMMENT['display'] is False: 
             DATA_DEBATE_Q['display'] = data['display']
+            DATA_DEBATE_ANSWER['display'] = False
         DATA_DEBATE_Q['img'] = get_q_photo()
         DATA_DEBATE_Q['title'] = data['title']
         DATA_DEBATE_Q['countDown'] = int(data['countDown'])
@@ -249,12 +251,14 @@ def debate_answer():
     global DATA_DEBATE_ALERT
     global DATA_DEBATE_Q
     global DATA_DEBATE_ANSWER
+    global DATA_DEBATE_COMMENT
     if request.method == 'POST':
         data = request.get_json(silent=True)
-        DATA_DEBATE_ANSWER['display'] = data['display']
-        if data['display']:
-            DATA_DEBATE_ALERT['display'] = False
-            DATA_DEBATE_Q['display'] = False
+        if DATA_DEBATE_Q['display'] is False and DATA_DEBATE_COMMENT['display'] is False: 
+            DATA_DEBATE_ANSWER['display'] = data['display']
+            if data['display']:
+                DATA_DEBATE_ALERT['display'] = False
+                DATA_DEBATE_Q['display'] = False
         DATA_DEBATE_ANSWER['img'] = get_answer_photo()
         DATA_DEBATE_ANSWER['countDown'] = int(data['countDown'])
         DATA_DEBATE_ANSWER['currentCountDown'] = int(data['currentCountDown'])
