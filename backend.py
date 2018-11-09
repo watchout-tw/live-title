@@ -44,12 +44,13 @@ def get_alert_photo():
     files = os.listdir(app.config['DEBATE_ALERT_FOLDER'])
     files.sort()
     file = files[-1]
+    print file
     return (app.config['DEBATE_ALERT_FOLDER']+'/'+file)
 
 def save_alert_photo(file):
     ts = time.time()
     ts = int(ts*1000000)
-    DATA_DEBATE_ALERT['img'] = str(ts) + '.png'
+    DATA_DEBATE_ALERT['img'] = str(ts) + '.gif'
     file.save(os.path.join(app.config['DEBATE_ALERT_FOLDER'], DATA_DEBATE_ALERT['img']))
 
 def get_q_photo():
@@ -257,7 +258,6 @@ def debate_answer():
         if DATA_DEBATE_Q['display'] is False and DATA_DEBATE_COMMENT['display'] is False: 
             DATA_DEBATE_ANSWER['display'] = data['display']
             if data['display']:
-                DATA_DEBATE_ALERT['display'] = False
                 DATA_DEBATE_Q['display'] = False
         DATA_DEBATE_ANSWER['img'] = get_answer_photo()
         DATA_DEBATE_ANSWER['countDown'] = int(data['countDown'])
@@ -289,7 +289,6 @@ def debate_comment():
         data = request.get_json(silent=True)
         DATA_DEBATE_COMMENT['display'] = data['display']
         if data['display']:
-            DATA_DEBATE_ALERT['display'] = False
             DATA_DEBATE_Q['display'] = False
             DATA_DEBATE_ANSWER['display'] = False
         DATA_DEBATE_COMMENT['img'] = get_comment_photo()
