@@ -49,7 +49,7 @@ def get_alert_photo():
 def save_alert_photo(file):
     ts = time.time()
     ts = int(ts*1000000)
-    DATA_DEBATE_ALERT['img'] = str(ts) + '.gif'
+    DATA_DEBATE_ALERT['img'] = str(ts) + '.png'
     file.save(os.path.join(app.config['DEBATE_ALERT_FOLDER'], DATA_DEBATE_ALERT['img']))
 
 def get_q_photo():
