@@ -44,7 +44,6 @@ def get_alert_photo():
     files = os.listdir(app.config['DEBATE_ALERT_FOLDER'])
     files.sort()
     file = files[-1]
-    print file
     return (app.config['DEBATE_ALERT_FOLDER']+'/'+file)
 
 def save_alert_photo(file):
