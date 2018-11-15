@@ -80,6 +80,11 @@
   .main{
     background-color: rgb(255,255,255,0.3);
   }
+  .sub-title {
+    line-height: 40px;
+    font-size: 24px;
+    font-weight: 700;
+  }
 </style>
 
 <body>
@@ -134,14 +139,20 @@
                 <i class="el-icon-plus"></i>
               </el-upload>
             </el-col>
-            <el-col :sm="4" class="center">
+            <el-col :sm="5" class="center">
                 <h1>目前圖片</h1>
                 <div 
                   class="image_item"
                   v-bind:style="{ backgroundImage: 'url(' + debateQuestion.img + ')'}">
                 </div>
+                <div style="margin-top: 20px;">
+                  <el-row :gutter="5">
+                    <el-col :sm="3" class="sub-title">X</el-col><el-col :sm="9"><el-input v-model="debateQuestion.posX" placeholder="" type="number"></el-input></el-col>
+                    <el-col :sm="3" class="sub-title">Y</el-col><el-col :sm="9"><el-input v-model="debateQuestion.posY" placeholder="" type="number"></el-input></el-col>
+                  </el-row>
+                </div>
               </el-col>
-            <el-col :sm="8" class="center">
+            <el-col :sm="7" class="center">
               <h1>Q標題</h1>
               <el-input
                 type="textarea"
@@ -211,6 +222,12 @@
                   class="image_item"
                   v-bind:style="{ backgroundImage: 'url(' + debateComment.img + ')'}">
                 </div>
+                <div style="margin-top: 20px;">
+                  <el-row :gutter="5">
+                    <el-col :sm="3" class="sub-title">X</el-col><el-col :sm="9"><el-input v-model="debateComment.posX" placeholder="" type="number"></el-input></el-col>
+                    <el-col :sm="3" class="sub-title">Y</el-col><el-col :sm="9"><el-input v-model="debateComment.posY" placeholder="" type="number"></el-input></el-col>
+                  </el-row>
+                </div>
               </el-col>
             <el-col :sm="8" class="center">
               <h1>C標題</h1>
@@ -249,7 +266,9 @@
           title: '',
           display: false,
           currentCountDown: 0,
-          countDown: 10
+          countDown: 10,
+          posX: 425,
+          posY: 768
         },
         debateAnswer: {
           img:'',
@@ -262,11 +281,14 @@
           title: '',
           display: false,
           currentCountDown: 0,
-          countDown: 6
+          countDown: 6,
+          posX: 425,
+          posY: 878
         },
       }
     },
     mounted: function () {
+      this.getInfo(true);
       this.timer();
     },
     methods: {
@@ -294,7 +316,7 @@
       hiddenDebateComment(){
         this.doActionInfo('comment', false, this.debateComment);
       },
-      getInfo() {
+      getInfo(init) {
         axios({
           method: 'get',
           url: '/debate/data',
@@ -303,7 +325,7 @@
           this.debateAlert.img = response.data.debateAlert.img;
           this.debateAlert.display = response.data.debateAlert.display;
           this.debateAlert.currentCountDown = response.data.debateAlert.currentCountDown;
- 
+
           this.debateQuestion.img = response.data.debateQuestion.img;
           this.debateQuestion.display = response.data.debateQuestion.display;
           this.debateQuestion.currentCountDown = response.data.debateQuestion.currentCountDown;
@@ -315,6 +337,15 @@
           this.debateComment.img = response.data.debateComment.img;
           this.debateComment.display = response.data.debateComment.display;
           this.debateComment.currentCountDown = response.data.debateComment.currentCountDown;
+
+          if(init) {
+            this.debateQuestion.title = response.data.debateQuestion.title;
+            this.debateQuestion.posX = response.data.debateQuestion.posX;
+            this.debateQuestion.posY = response.data.debateQuestion.posY;
+            this.debateComment.title = response.data.debateComment.title;
+            this.debateComment.posX = response.data.debateComment.posX;
+            this.debateComment.posY = response.data.debateComment.posY;
+          }
 
         })
         .catch((error) => {
@@ -328,6 +359,8 @@
         let title = null;
         let countDown = obj.countDown;    
         let currentCountDown = 0;
+        let posX = 0;
+        let posY = 0;
         switch (action) {
           case 'alert':
             url = '/debate/data/alert';
@@ -342,7 +375,9 @@
             break;
           case 'question':
             url = '/debate/data/question';
-            title = obj.title
+            title = obj.title;
+            posX = parseInt(obj.posX);
+            posY = parseInt(obj.posY);
             if (display) {
               msg = '(2) Question 顯示'+ obj.countDown + '秒';
               currentCountDown = obj.countDown;
@@ -365,7 +400,9 @@
             break;
           case 'comment':
             url = '/debate/data/comment';
-            title = obj.title
+            title = obj.title;
+            posX = parseInt(obj.posX);
+            posY = parseInt(obj.posY);
             if (display) {
               msg = '(4) Comment 顯示'+ obj.countDown + '秒';
               currentCountDown =  parseInt(obj.countDown);
@@ -380,9 +417,10 @@
           display: display,
           title: title,
           countDown: countDown,
-          currentCountDown: currentCountDown
+          currentCountDown: currentCountDown,
+          posX: posX,
+          posY: posY
         }
-        console.log('data :', dataD)
         axios({
           method: 'post',
           url: url,
@@ -406,7 +444,7 @@
       timer() {
         let self = this;
         setInterval(function(){
-          self.getInfo();
+          self.getInfo(false);
         }, 1000);
       },
       showError(error){

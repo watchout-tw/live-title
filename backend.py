@@ -100,7 +100,9 @@ DATA_DEBATE_Q = {
     'img': get_q_photo(),
     'display': False,
     'countDown': 10,
-    'currentCountDown': 0
+    'currentCountDown': 0,
+    'posX': 425,
+    'posY': 768
 }
 
 DATA_DEBATE_ANSWER = {
@@ -115,7 +117,9 @@ DATA_DEBATE_COMMENT = {
     'img': get_comment_photo(),
     'display': False,
     'countDown': 6,
-    'currentCountDown': 0
+    'currentCountDown': 0,
+    'posX': 425,
+    'posY': 884
 }
 
 
@@ -229,6 +233,8 @@ def debate_question():
         DATA_DEBATE_Q['title'] = data['title']
         DATA_DEBATE_Q['countDown'] = int(data['countDown'])
         DATA_DEBATE_Q['currentCountDown'] = int(data['currentCountDown'])
+        DATA_DEBATE_Q['posX'] = int(data['posX'])
+        DATA_DEBATE_Q['posY'] = int(data['posY'])
         return generate_json(DATA_DEBATE_Q)
     else:
         DATA_DEBATE_Q['img'] = get_q_photo()
@@ -294,6 +300,8 @@ def debate_comment():
         DATA_DEBATE_COMMENT['title'] = data['title']
         DATA_DEBATE_COMMENT['countDown'] = int(data['countDown'])
         DATA_DEBATE_COMMENT['currentCountDown'] = int(data['currentCountDown'])
+        DATA_DEBATE_COMMENT['posX'] = int(data['posX'])
+        DATA_DEBATE_COMMENT['posY'] = int(data['posY'])
         return generate_json(DATA_DEBATE_COMMENT)
     else:
         DATA_DEBATE_COMMENT['img'] = get_comment_photo()
