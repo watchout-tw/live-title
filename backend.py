@@ -119,7 +119,7 @@ DATA_DEBATE_COMMENT = {
     'countDown': 6,
     'currentCountDown': 0,
     'posX': 425,
-    'posY': 884
+    'posY': 875
 }
 
 
